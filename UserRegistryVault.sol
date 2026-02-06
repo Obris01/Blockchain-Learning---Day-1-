@@ -74,8 +74,9 @@ contract UserRegistryVault {
         totalDeposits += msg.value;
     }
 
-    error InsufficientBalance();
+    error InsufficientBalance();  //! @dev move this to the top,
     // Withdrawing ETH from the vault
+    // @dev good CEI pattern
     function withdraw(uint256 amount) external onlyActiveUser {
         if (users[msg.sender].balance < amount) {
             revert InsufficientBalance();
@@ -84,7 +85,7 @@ contract UserRegistryVault {
         users[msg.sender].balance -= amount;
         totalDeposits -= amount;
 
-        _safeTransfer(msg.sender, amount);
+        _safeTransfer(msg.sender, amount); //@dev good use of safe transfer
     }
 
     // For viewing the user data
@@ -99,7 +100,7 @@ contract UserRegistryVault {
     // OWNER FUNCTIONS(user status (Active / Suspended / Banned)
     function setStatus(address user, Status newStatus)
         external
-        onlyOwner
+        onlyOwner //@dev great
     {
         require(users[user].createdAt != 0, "User not registered");
         users[user].status = newStatus;
@@ -112,6 +113,7 @@ contract UserRegistryVault {
     }
 
     //ERROR DEMONSTRATION
+    // @dev this is good but next time include within the functions you are writing
     function failWithRequire() external pure {
         require(false, "Require failed");
     }
