@@ -20,7 +20,7 @@ contract OwnedTest is Test {
         bool result = owned.onlyOwnerFunction();
         assertTrue(result);
     }
-// Commenting out the Negative testing.
+    // Commenting out the Negative testing.
     // function testNonOwnerCanNotCallRestrictedFunction() public {
     //     vm.prank(user);
     //     vm.expectRevert("Not Owner");
