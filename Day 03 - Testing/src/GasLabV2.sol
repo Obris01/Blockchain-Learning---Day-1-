@@ -4,12 +4,12 @@ pragma solidity ^0.8.20;
 contract GasLabV2 {
 
     // 🔹 Packed into one storage slot
-    address public owner;
-    uint128 public limit;
-    bool public active;
+    address public owner; // !@dev this is 160 bits, so once you store this i leaves 96 bits of that slot empty
+    uint128 public limit; // !@dev 128 bits should go into another slot
+    bool public active;  // !@dev this would be packed into the second slot with 128 public limit not the first
 
     // 🔹 Separate slot (uint256)
-    uint256 public total;
+    uint256 public total;  // !@dev correct
 
     mapping(address => uint256) public balances;
 

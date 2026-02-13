@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+// @dev good minimal implementation
+
+
 contract MinimalToken {
 
     string public name = "Minimal Token";
@@ -24,8 +27,8 @@ contract MinimalToken {
         totalSupply = initialSupply;
         balanceOf[msg.sender] = initialSupply;
     }
-
-    function transfer(address to, uint256 amount) external returns (bool) {
+// !@dev can you explain your choice to return a boolean here
+    function transfer(address to, uint256 amount) external returns (bool) { 
         require(to != address(0), "Invalid address");
         require(balanceOf[msg.sender] >= amount, "Insufficient balance");
 
