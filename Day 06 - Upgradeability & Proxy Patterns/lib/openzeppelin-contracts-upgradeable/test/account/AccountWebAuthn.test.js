@@ -36,7 +36,7 @@ async function fixture() {
   ]);
 
   // ERC-4337 Entrypoint domain
-  const entrypointDomain = await getDomain(predeploy.entrypoint.v08);
+  const entrypointDomain = await getDomain(predeploy.entrypoint.v09);
 
   // domain cannot be fetched using getDomain(mock) before the mock is deployed
   const domain = {
@@ -64,19 +64,6 @@ describe('AccountWebAuthn', function () {
     beforeEach(async function () {
       this.signer = webAuthnSigner;
       this.mock = this.webAuthnMock;
-      this.domain.verifyingContract = this.mock.address;
-    });
-
-    shouldBehaveLikeAccountCore();
-    shouldBehaveLikeAccountHolder();
-    shouldBehaveLikeERC1271({ erc7739: true });
-    shouldBehaveLikeERC7821();
-  });
-
-  describe('as regular P256 validator', function () {
-    beforeEach(async function () {
-      this.signer = p256Signer;
-      this.mock = this.p256Mock;
       this.domain.verifyingContract = this.mock.address;
     });
 

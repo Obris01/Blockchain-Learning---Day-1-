@@ -94,7 +94,7 @@ abstract contract AccountERC7579Upgradeable is Initializable, Account, IERC1271,
     /// @inheritdoc IERC7579AccountConfig
     function accountId() public view virtual returns (string memory) {
         // vendorname.accountname.semver
-        return "@openzeppelin/community-contracts.AccountERC7579.v0.0.0";
+        return "@openzeppelin/contracts.AccountERC7579.v1.0.0";
     }
 
     /**
@@ -314,7 +314,8 @@ abstract contract AccountERC7579Upgradeable is Initializable, Account, IERC1271,
             delete $._fallbacks[selector];
         }
 
-        IERC7579Module(module).onUninstall(deInitData);
+        // Ignores success purposely to avoid modules that revert on uninstall
+        LowLevelCall.callNoReturn(module, abi.encodeCall(IERC7579Module.onUninstall, (deInitData)));
         emit ModuleUninstalled(moduleTypeId, module);
     }
 
@@ -413,7 +414,7 @@ abstract contract AccountERC7579Upgradeable is Initializable, Account, IERC1271,
      * actual copy. However, this would require `_installModule` to get a calldata bytes object instead of a memory
      * bytes object. This would prevent calling `_installModule` from a contract constructor and would force the use
      * of external initializers. That may change in the future, as most accounts will probably be deployed as
-     * clones/proxy/ERC-7702 delegates and therefore rely on initializers anyway.
+     * clones/proxy/EIP-7702 delegates and therefore rely on initializers anyway.
      */
     function _decodeFallbackData(
         bytes memory data

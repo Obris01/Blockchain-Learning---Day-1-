@@ -58,7 +58,7 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
  * functions. Overriding {_deposit} automatically affects both {deposit} and {mint}. Similarly, overriding {_withdraw}
  * automatically affects both {withdraw} and {redeem}. Overall it is not recommended to override the public facing
  * functions since that could lead to inconsistent behaviors between the {deposit} and {mint} or between {withdraw} and
- * {redeem}, which is documented to have lead to loss of funds.
+ * {redeem}, which is documented to have led to loss of funds.
  *
  * * Overrides to the deposit or withdraw mechanism must be reflected in the preview functions as well.
  *
@@ -99,12 +99,12 @@ abstract contract ERC4626Upgradeable is Initializable, ERC20Upgradeable, IERC462
     error ERC4626ExceededMaxMint(address receiver, uint256 shares, uint256 max);
 
     /**
-     * @dev Attempted to withdraw more assets than the max amount for `receiver`.
+     * @dev Attempted to withdraw more assets than the max amount for `owner`.
      */
     error ERC4626ExceededMaxWithdraw(address owner, uint256 assets, uint256 max);
 
     /**
-     * @dev Attempted to redeem more shares than the max amount for `receiver`.
+     * @dev Attempted to redeem more shares than the max amount for `owner`.
      */
     error ERC4626ExceededMaxRedeem(address owner, uint256 shares, uint256 max);
 
@@ -131,7 +131,7 @@ abstract contract ERC4626Upgradeable is Initializable, ERC20Upgradeable, IERC462
             address(asset_),
             abi.encodeCall(IERC20Metadata.decimals, ())
         );
-        Memory.setFreeMemoryPointer(ptr);
+        Memory.unsafeSetFreeMemoryPointer(ptr);
 
         return
             (success && LowLevelCall.returnDataSize() >= 32 && uint256(returnedDecimals) <= type(uint8).max)
@@ -289,7 +289,7 @@ abstract contract ERC4626Upgradeable is Initializable, ERC20Upgradeable, IERC462
         // Conclusion: we need to do the transfer before we mint so that any reentrancy would happen before the
         // assets are transferred and before the shares are minted, which is a valid state.
         // slither-disable-next-line reentrancy-no-eth
-        SafeERC20.safeTransferFrom(IERC20(asset()), caller, address(this), assets);
+        _transferIn(caller, assets);
         _mint(receiver, shares);
 
         emit Deposit(caller, receiver, assets, shares);
@@ -316,9 +316,19 @@ abstract contract ERC4626Upgradeable is Initializable, ERC20Upgradeable, IERC462
         // Conclusion: we need to do the transfer after the burn so that any reentrancy would happen after the
         // shares are burned and after the assets are transferred, which is a valid state.
         _burn(owner, shares);
-        SafeERC20.safeTransfer(IERC20(asset()), receiver, assets);
+        _transferOut(receiver, assets);
 
         emit Withdraw(caller, receiver, owner, assets, shares);
+    }
+
+    /// @dev Performs a transfer in of underlying assets. The default implementation uses `SafeERC20`. Used by {_deposit}.
+    function _transferIn(address from, uint256 assets) internal virtual {
+        SafeERC20.safeTransferFrom(IERC20(asset()), from, address(this), assets);
+    }
+
+    /// @dev Performs a transfer out of underlying assets. The default implementation uses `SafeERC20`. Used by {_withdraw}.
+    function _transferOut(address to, uint256 assets) internal virtual {
+        SafeERC20.safeTransfer(IERC20(asset()), to, assets);
     }
 
     function _decimalsOffset() internal view virtual returns (uint8) {

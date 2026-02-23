@@ -18,10 +18,20 @@
 > [!IMPORTANT]
 > OpenZeppelin Contracts uses semantic versioning to communicate backwards compatibility of its API and storage layout. For upgradeable contracts, the storage layout of different major versions should be assumed incompatible, for example, it is unsafe to upgrade from 4.9.3 to 5.0.0. Learn more at [Backwards Compatibility](https://docs.openzeppelin.com/contracts/backwards-compatibility).
 
-+> [!NOTE]
-+> You are looking at the upgradeable variant of OpenZeppelin Contracts. Be sure to review the documentation on [Using OpenZeppelin Contracts with Upgrades](https://docs.openzeppelin.com/contracts/upgradeable).
-+
+> [!NOTE]
+> You are looking at the upgradeable variant of OpenZeppelin Contracts. Be sure to review the documentation on [Using OpenZeppelin Contracts with Upgrades](https://docs.openzeppelin.com/contracts/upgradeable).
+
 ## Overview
+
+### Release tags
+
+We use NPM tags to clearly distinguish between audited and non-audited versions of our package:
+
+| Tag        | Purpose                  | Description                                                                                                                                                                   |
+| :--------- | :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **latest** | ✅ Audited releases      | Stable, audited versions of the package. This is the **default** version installed when users run `npm install @openzeppelin/contracts`.                                      |
+| **dev**    | 🧪 Final but not audited | Versions that are finalized and feature-complete but have **not yet been audited**. This version is fully tested, can be used in production and is covered by the bug bounty. |
+| **next**   | 🚧 Release candidates    | Pre-release versions that are **not final**. Used for testing and validation before the version becomes a final `dev` or `latest` release.                                    |
 
 ### Installation
 
@@ -30,6 +40,12 @@
 ```
 $ npm install @openzeppelin/contracts-upgradeable
 ```
+→ Installs the latest audited release (`latest`).
+
+```
+$ npm install @openzeppelin/contracts-upgradeable@dev
+```
+→ Installs the latest unaudited release (`dev`).
 
 #### Foundry (git)
 

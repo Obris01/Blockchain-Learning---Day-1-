@@ -1,11 +1,23 @@
 # Changelog
 
+### Breaking changes
+
+- `Strings`: The `escapeJSON` function now escapes all control characters in the range U+0000 to U+001F per RFC-4627. Previously only backspace, tab, newline, form feed, carriage return, double quote, and backslash were escaped. Input strings containing any other control character (e.g. null `0x00`) or raw bytes in U+0001–U+001F will now produce different, longer output (e.g. `\u0000` for null). ([#6344](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/6344))
+- `ERC1155`: Performing batch transfers with exactly one id/value in the batch no-longer calls `IERC1155Receiver.onERC1155Received`. `IERC1155Receiver.onERC1155BatchReceived` is called instead (with arrays of length one). ([#6170](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/6170))
+- `ERC1967Proxy` and `TransparentUpgradeableProxy`: Mandate initialization during construction. Deployment now reverts with `ERC1967ProxyUninitialized` if an initialize call is not provided. Developers that rely on the previous behavior and want to disable this check can do so by overriding the internal `_unsafeAllowUninitialized` function to return true. ([#5906](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/5906))
+- `ERC721` and `ERC1155`: Prevent setting an operator for `address(0)`. In the case of `ERC721` this type of operator allowance could lead to obfuscated mint permission. ([#6171](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/6171))
+- `RLP`: The `encode(bytes32)` function now encodes `bytes32` as a fixed size item and not as a scalar in `encode(uint256)`. Users must replace calls to `encode(bytes32)` with `encode(uint256(bytes32))` to preserve the same behavior. ([#6167](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/6167))
+- `ERC4337Utils`: The `parseValidationData` now returns a `ValidationRange` as the last return tuple value indicating whether the `validationData` is compared against a timestamp or block number. Developers must update their code to handle this new return value (e.g. `(aggregator, validAfter, validUntil) -> (aggregator, validAfter, validUntil, range)`). ([#6215](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/6215))
+- `SignerWebAuthn`: The `_rawSignatureValidation` function now returns `false` when the signature is not a valid WebAuthn authentication assertion. P256 fallback is removed. Developers can add it back by overriding the function. ([#6337](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/6337))
+- `Memory`: The `setFreeMemoryPointer` function is renamed to `unsafeSetFreeMemoryPointer`. Developers should use `unsafeSetFreeMemoryPointer` instead of `setFreeMemoryPointer` after v5.6.0.  ([#6348](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/6348))
+
 ## 5.5.0 (2025-10-31)
 
 ### Bug fixes
 
 - `AccountERC7579`: Prevent revert in `isModuleInstalled` for fallback modules when `additionalContext` has fewer than 4 bytes. The function now returns `false` instead of reverting, ensuring ERC-7579 compliance. ([#5961](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/5961))
-- `ERC165Checker`: Ensure the `supportsERC165` function returns false if the target reverts during the `supportsInterface(0xffffffff)` call. ([#5810](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/5880))
+- `ERC165Checker`: Ensure the `supportsERC165` function returns false if the target reverts during the `supportsInterface(0xffffffff)` call. ([#5880](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/5880))
+- `AccountERC7579`: Prevent revert in `isModuleInstalled` for fallback modules when `additionalContext` has fewer than 4 bytes. The function now returns `false` instead of reverting, ensuring ERC-7579 compliance. ([#5961](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/5961))
 
 ### Breaking changes
 
@@ -18,7 +30,7 @@
 
 ### Deprecation
 
-- `Initializable` and `UUPSUpgradeable` are no longer transpiled. An alias is present in the `@openzeppelin/contracts-upgradeable` package that redirect to the corresponding file in `@openzeppelin/contracts`. These alias will be removed in the next major release. Developers are advised to update their imports to get these files directly from the `@openzeppelin/contracts` package. [#5941](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/5941)
+- `Initializable` and `UUPSUpgradeable` are no longer transpiled. Aliases are present in the `@openzeppelin/contracts-upgradeable` package that redirect to the corresponding files in `@openzeppelin/contracts`. These aliases will be removed in the next major release. Developers are advised to update their imports to get these files directly from the `@openzeppelin/contracts` package. [#5941](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/5941)
 - `ECDSA` signature malleability protection is partly deprecated. See documentation for more details. [#5814](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/5814)
 
 ### Changes by category
@@ -86,7 +98,7 @@
 
 ### Pragma changes
 
-- Reduced pragma requirement of interface files
+- Reduced pragma requirement of interface files.
 
 ### Changes by category
 
