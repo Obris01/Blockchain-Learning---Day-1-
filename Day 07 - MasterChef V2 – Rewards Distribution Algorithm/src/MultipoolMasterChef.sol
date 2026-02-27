@@ -51,9 +51,11 @@ contract MultiPoolMasterChef is Ownable {
                 accRewardPerShare: 0,
                 totalStaked: 0
             })
-        );
+        ); // @Obris01 great, the addPool function correctly adds a new pool to the poolInfo array and updates the total allocation points. It also initializes the pool's reward variables and total staked amount.
     }
 
+    // @Obris01 great, the updatePool function is well implemented and correctly updates the reward variables based on the number of blocks that have passed since the last update. 
+    // It also handles the case where there are no staked tokens to avoid division by zero
     function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
 
@@ -78,6 +80,7 @@ contract MultiPoolMasterChef is Ownable {
         pool.lastRewardBlock = block.number;
     }
 
+    // @Obris01, good so far
     function deposit(uint256 _pid, uint256 _amount) external {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
@@ -105,6 +108,8 @@ contract MultiPoolMasterChef is Ownable {
             (user.amount * pool.accRewardPerShare) / 1e12;
     }
 
+    // @Obris01 great, the withdraw function correctly checks if the user has enough staked tokens to withdraw, updates the pool, calculates and transfers any pending rewards to the user, and then updates the user's staked amount and reward debt after transferring the stake tokens back to the user.
+    // Also, see comments in the SimpleMasterChef contract for possible improvements regarding the Check-Effects-Interactions pattern and gas optimization by storing user.amount in a local variable.
     function withdraw(uint256 _pid, uint256 _amount) external {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
@@ -128,6 +133,7 @@ contract MultiPoolMasterChef is Ownable {
             (user.amount * pool.accRewardPerShare) / 1e12;
     }
 
+    // @Obris01 great, the pendingReward function correctly calculates the pending rewards for a user based on their staked amount and the accumulated reward per share for the specific pool. It also accounts for any new rewards that have been accumulated since the last update of the pool.
     function pendingReward(uint256 _pid, address _user) external view returns (uint256)
     {
         PoolInfo memory pool = poolInfo[_pid];
@@ -147,4 +153,7 @@ contract MultiPoolMasterChef is Ownable {
             (user.amount * _accRewardPerShare) / 1e12
             - user.rewardDebt;
     }
+
+    // other observations: possible improvements
+    // see comments in the SimpleMasterChef contract for possible improvements regarding adding an emergencyWithdraw function, allowing the owner to update the reward per block, allowing users to claim their rewards without having to deposit or withdraw, and allowing users to view their staked amount and pending rewards without having to call the pendingReward function.
 }
